@@ -11,6 +11,8 @@ import {
 import Skeleton from "@material-ui/lab/Skeleton";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import { capitalize } from "lodash";
+import { gql, useQuery } from "@apollo/client";
+import { MINUTE } from "utils/time";
 
 const WEEK_DAYS = {
   0: "Sun",
@@ -25,6 +27,7 @@ const WEEK_DAYS = {
 const parseTimeValue = (value) => (value < 10 ? `0${value}` : value);
 
 const getDayString = (date) => {
+  // TODO: use date-fns
   const weekDay = date.getDay();
   const hours = date.getHours();
   const minutes = date.getMinutes();
@@ -52,7 +55,7 @@ const Title = ({ cityName = "", onRefresh }) => {
 const DateString = ({ isLoading = false, date }) => {
   return (
     <Typography color="textSecondary">
-      {isLoading ? <Skeleton width="100%" /> : getDayString(date)}
+      {isLoading ? <Skeleton /> : getDayString(date)}
     </Typography>
   );
 };
@@ -60,11 +63,7 @@ const DateString = ({ isLoading = false, date }) => {
 const WeatherIcon = ({ statusCode }) => {
   return (
     <Avatar
-      src={
-        statusCode
-          ? `http://openweathermap.org/img/wn/${statusCode}@2x.png`
-          : ""
-      }
+      src={`http://openweathermap.org/img/wn/${statusCode}@2x.png`}
       alt="weather"
       style={{
         height: "72px",
@@ -93,65 +92,89 @@ const StatusDescription = ({ description, isLoading }) => {
   );
 };
 
-const CityWeatherCard = ({
-  isLoading = false,
-  cityName = "",
-  date = new Date(),
-  temperature = 0,
-  statusCode = "",
-  description = "",
-  onRefresh,
-}) => {
-  return (
-    <Card
-      style={{
-        minWidth: "330px",
-      }}
-    >
-      <CardContent>
+const CITY_WEATHER = gql`
+  query GetCityWeather($city: String!, $date: Date) {
+    cityWeather(city: $city, date: $date) {
+      city
+      temperature
+      date
+      weather {
+        description
+        iconCode
+      }
+    }
+  }
+`;
+
+const CityWeatherCard = ({ name, date = new Date() }) => {
+  const {
+    error,
+    data = {},
+    loading: isLoading,
+    refetch,
+  } = useQuery(CITY_WEATHER, {
+    variables: {
+      city: name,
+    },
+    pollInterval: MINUTE,
+    notifyOnNetworkStatusChange: true,
+  });
+
+  const renderCardContent = () => {
+    const {
+      cityWeather: {
+        temperature,
+        weather: { description, iconCode } = {},
+      } = {},
+    } = data;
+
+    return (
+      <>
         <Box>
           {isLoading ? (
-            <Skeleton
-              style={{
-                maxWidth: "none",
-              }}
-            >
-              <Title cityName={cityName} onRefresh={onRefresh} />
+            <Skeleton width="100%">
+              <Title cityName="city name" />
             </Skeleton>
           ) : (
-            <Title cityName={cityName} onRefresh={onRefresh} />
+            <Title cityName={name} onRefresh={() => refetch()} />
           )}
         </Box>
         <DateString isLoading={isLoading} date={date} />
-        <Box display="flex">
-          {isLoading ? (
-            <Skeleton
-              style={{ display: "flex", width: "100%", maxWidth: "none" }}
-            >
+        {isLoading ? (
+          <Skeleton width="100%">
+            <Box display="flex">
               <Temperature temperature={0} />
-              <WeatherIcon statusCode={statusCode} />
-            </Skeleton>
-          ) : (
-            <>
-              <Temperature temperature={temperature} />
-              <WeatherIcon statusCode={statusCode} />
-            </>
-          )}
-        </Box>
+            </Box>
+          </Skeleton>
+        ) : (
+          <Box display="flex">
+            <Temperature temperature={temperature} />
+            <WeatherIcon statusCode={iconCode} />
+          </Box>
+        )}
         <StatusDescription isLoading={isLoading} description={description} />
+      </>
+    );
+  };
+
+  return (
+    <Card
+      style={{
+        width: "320px",
+        height: "200px",
+      }}
+      variant="outlined"
+    >
+      <CardContent>
+        {error ? error.toString() : renderCardContent()}
       </CardContent>
     </Card>
   );
 };
 
 CityWeatherCard.propTypes = {
-  cityName: PropTypes.string,
+  name: PropTypes.string,
   date: PropTypes.instanceOf(Date),
-  description: PropTypes.string,
-  isLoading: PropTypes.bool,
-  onRefresh: PropTypes.func,
-  statusCode: PropTypes.string,
-  temperature: PropTypes.number,
 };
 
 export default CityWeatherCard;
