@@ -10,7 +10,6 @@ import {
 } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
 import RefreshIcon from "@material-ui/icons/Refresh";
-import { capitalize } from "lodash";
 import { gql, useQuery } from "@apollo/client";
 import { MINUTE } from "utils/time";
 
@@ -87,7 +86,7 @@ const Temperature = ({ temperature }) => {
 const StatusDescription = ({ description, isLoading }) => {
   return (
     <Typography variant="h5" component="div">
-      {isLoading ? <Skeleton width="100%" /> : capitalize(description)}
+      {isLoading ? <Skeleton width="100%" /> : description}
     </Typography>
   );
 };
