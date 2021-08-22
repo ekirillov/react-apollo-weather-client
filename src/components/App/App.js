@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Box, Grid, Typography } from "@material-ui/core";
-import CityWeatherCard from "components/CityWeatherCard";
-import AddCity from "components/AddCity";
+import WeatherReportCard from "components/WeatherReportCard";
+import AddWeatherReport from "components/AddWeatherReport";
 
 const App = () => {
-  const [cities, setCities] = useState(["Smolensk", "Moscow", "Kyiv"]);
+  const [cities, setCities] = useState(["Kyiv"]);
   return (
     <Box p={2}>
       <Typography
@@ -16,12 +16,14 @@ const App = () => {
         Weather cards
       </Typography>
       <Box mb={2}>
-        <AddCity onAdd={(newCity) => setCities(() => [...cities, newCity])} />
+        <AddWeatherReport
+          onAdd={(newCity) => setCities(() => [...cities, newCity])}
+        />
       </Box>
       <Grid container spacing={4}>
         {cities.map((city) => (
           <Grid item key={city}>
-            <CityWeatherCard name={city} />
+            <WeatherReportCard name={city} />
           </Grid>
         ))}
       </Grid>

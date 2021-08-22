@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, TextField } from "@material-ui/core";
 
-const AddCity = ({ onAdd }) => {
+const AddWeatherReport = ({ onAdd }) => {
   const [city, setCity] = useState("");
 
   return (
@@ -22,14 +22,14 @@ const AddCity = ({ onAdd }) => {
         onChange={(e) => setCity(e.target.value)}
       />
       <Button variant="outlined" size="small" color="primary" type="submit">
-        Add new city
+        Add new weather report
       </Button>
     </form>
   );
 };
 
-AddCity.propTypes = {
+AddWeatherReport.propTypes = {
   onAdd: PropTypes.func.isRequired,
 };
 
-export default AddCity;
+export default AddWeatherReport;

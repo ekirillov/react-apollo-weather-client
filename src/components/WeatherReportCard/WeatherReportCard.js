@@ -91,39 +91,39 @@ const StatusDescription = ({ description, isLoading }) => {
   );
 };
 
-const CITY_WEATHER = gql`
-  query GetCityWeather($city: String!, $date: Date) {
-    cityWeather(city: $city, date: $date) {
-      city
+const WEATHER_REPORT = gql`
+  query Query($city: String!) {
+    weatherReport(city: $city) {
       temperature
       date
-      weather {
+      weatherCondition {
         description
-        iconCode
+        icon
       }
     }
   }
 `;
 
-const CityWeatherCard = ({ name, date = new Date() }) => {
+const WeatherReportCard = ({ name }) => {
   const {
     error,
     data = {},
     loading: isLoading,
     refetch,
-  } = useQuery(CITY_WEATHER, {
+  } = useQuery(WEATHER_REPORT, {
     variables: {
       city: name,
     },
-    pollInterval: MINUTE,
+    pollInterval: 10 * MINUTE,
     notifyOnNetworkStatusChange: true,
   });
 
   const renderCardContent = () => {
     const {
-      cityWeather: {
+      weatherReport: {
         temperature,
-        weather: { description, iconCode } = {},
+        date,
+        weatherCondition: { description, icon } = {},
       } = {},
     } = data;
 
@@ -138,7 +138,7 @@ const CityWeatherCard = ({ name, date = new Date() }) => {
             <Title cityName={name} onRefresh={() => refetch()} />
           )}
         </Box>
-        <DateString isLoading={isLoading} date={date} />
+        <DateString isLoading={isLoading} date={new Date(date)} />
         {isLoading ? (
           <Skeleton width="100%">
             <Box display="flex">
@@ -148,7 +148,7 @@ const CityWeatherCard = ({ name, date = new Date() }) => {
         ) : (
           <Box display="flex">
             <Temperature temperature={temperature} />
-            <WeatherIcon statusCode={iconCode} />
+            <WeatherIcon statusCode={icon} />
           </Box>
         )}
         <StatusDescription isLoading={isLoading} description={description} />
@@ -171,9 +171,8 @@ const CityWeatherCard = ({ name, date = new Date() }) => {
   );
 };
 
-CityWeatherCard.propTypes = {
+WeatherReportCard.propTypes = {
   name: PropTypes.string,
-  date: PropTypes.instanceOf(Date),
 };
 
-export default CityWeatherCard;
+export default WeatherReportCard;
