@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Box, Grid, Typography } from "@material-ui/core";
 import WeatherReportCard from "components/WeatherReportCard";
-import AddWeatherReport from "components/AddWeatherReport";
+import AddWeatherReportForm from "components/AddWeatherReportForm";
 
 const App = () => {
-  const [cities, setCities] = useState(["Kyiv"]);
+  const [cities, setCities] = useState(["Moscow"]);
   return (
     <Box p={2}>
       <Typography
@@ -13,10 +13,10 @@ const App = () => {
         variant="h5"
         style={{ marginRight: "8px" }}
       >
-        Weather cards
+        Weather reports
       </Typography>
       <Box mb={2}>
-        <AddWeatherReport
+        <AddWeatherReportForm
           onAdd={(newCity) => setCities(() => [...cities, newCity])}
         />
       </Box>

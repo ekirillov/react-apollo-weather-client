@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, TextField } from "@material-ui/core";
 
-const AddWeatherReport = ({ onAdd }) => {
+const AddWeatherReportForm = ({ onAdd }) => {
   const [city, setCity] = useState("");
 
   return (
@@ -12,8 +12,6 @@ const AddWeatherReport = ({ onAdd }) => {
         e.preventDefault();
         onAdd(city);
       }}
-      display="flex"
-      alignItems="center"
     >
       <TextField
         style={{ marginRight: "8px" }}
@@ -28,8 +26,8 @@ const AddWeatherReport = ({ onAdd }) => {
   );
 };
 
-AddWeatherReport.propTypes = {
+AddWeatherReportForm.propTypes = {
   onAdd: PropTypes.func.isRequired,
 };
 
-export default AddWeatherReport;
+export default AddWeatherReportForm;
